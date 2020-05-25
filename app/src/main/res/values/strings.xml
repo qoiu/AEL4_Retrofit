@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">AEL4_Retrofit</string>
+    <string name="search">Search</string>
+    <string name="add_user">Add user</string>
+</resources>
