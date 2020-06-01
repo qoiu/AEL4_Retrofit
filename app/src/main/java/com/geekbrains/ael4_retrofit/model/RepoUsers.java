@@ -15,6 +15,9 @@ public class RepoUsers {
         this.img_url = img_url;
     }
 
+    public RepoUsers() {
+    }
+
     public RepoUserInfo getRepository(int id) {
         return repository.get(id);
     }

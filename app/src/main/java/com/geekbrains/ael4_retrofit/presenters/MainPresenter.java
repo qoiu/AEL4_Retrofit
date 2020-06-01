@@ -1,7 +1,5 @@
 package com.geekbrains.ael4_retrofit.presenters;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.geekbrains.ael4_retrofit.MainActivityInterface;
 import com.geekbrains.ael4_retrofit.model.Model;
 import com.geekbrains.ael4_retrofit.model.RepoUserInfo;
@@ -28,7 +26,6 @@ public class MainPresenter implements MainPresenterInterface {
     Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("https://api.github.com")
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            //.addConverterFactory(ScalarsConverterFactory.create()).build();
             .addConverterFactory(GsonConverterFactory.create()).build();
 
 
@@ -92,7 +89,6 @@ public class MainPresenter implements MainPresenterInterface {
                 }else {
                     activity.toastMsg(name+" - not found");
                 }
-
             }
 
             @Override
