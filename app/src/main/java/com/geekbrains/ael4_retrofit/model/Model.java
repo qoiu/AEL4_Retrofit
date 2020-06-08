@@ -10,7 +10,6 @@ public class Model {
 
     public List<RepoUsers> getUsersList() {
         return new ArrayList<>(userMap.values());
-
     }
 
     public boolean addUserRepos(List<RepoUserInfo> info,String name){

@@ -28,16 +28,16 @@ public class MainPresenter implements MainPresenterInterface {
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create()).build();
 
-    public void bindView(MainActivityInterface activity){
-        this.activity=activity;
+    public void bindView(MainActivityInterface activity) {
+        this.activity = activity;
     }
 
     private MainPresenter() {
-        model=new Model();
+        model = new Model();
     }
 
-    public static MainPresenterInterface get(){
-        if(presenter==null)presenter=new MainPresenter();
+    public static MainPresenterInterface get() {
+        if (presenter == null) presenter = new MainPresenter();
         return presenter;
     }
 
@@ -53,7 +53,7 @@ public class MainPresenter implements MainPresenterInterface {
 
             @Override
             public void onError(Throwable e) {
-                activity.toastMsg("We have some problems: \n"+e.getLocalizedMessage());
+                activity.toastMsg("We have some problems: \n" + e.getLocalizedMessage());
             }
         });
     }
@@ -70,7 +70,7 @@ public class MainPresenter implements MainPresenterInterface {
 
             @Override
             public void onError(Throwable e) {
-                activity.toastMsg("We have some problems: \n"+e.getLocalizedMessage());
+                activity.toastMsg("We have some problems: \n" + e.getLocalizedMessage());
             }
         });
     }
@@ -81,22 +81,22 @@ public class MainPresenter implements MainPresenterInterface {
         disposable = single.retry(2).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribeWith(new DisposableSingleObserver<List<RepoUserInfo>>() {
             @Override
             public void onSuccess(List<RepoUserInfo> repoUsersInfo) {
-                if(model.addUserRepos(repoUsersInfo,name)){
+                if (model.addUserRepos(repoUsersInfo, name)) {
                     activity.showUserRepos(name);
-                }else {
-                    activity.toastMsg(name+" - not found");
+                } else {
+                    activity.toastMsg(name + " - not found");
                 }
             }
 
             @Override
             public void onError(Throwable e) {
-                activity.toastMsg("We have some problems: \n"+e.getLocalizedMessage());
+                activity.toastMsg("We have some problems: \n" + e.getLocalizedMessage());
             }
         });
     }
 
     @Override
-    public List<RepoUsers> getUsersList(){
+    public List<RepoUsers> getUsersList() {
         return model.getUsersList();
     }
 
