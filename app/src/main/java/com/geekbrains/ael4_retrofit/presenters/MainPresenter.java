@@ -28,8 +28,6 @@ public class MainPresenter implements MainPresenterInterface {
             .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
             .addConverterFactory(GsonConverterFactory.create()).build();
 
-
-
     public void bindView(MainActivityInterface activity){
         this.activity=activity;
     }
@@ -42,7 +40,6 @@ public class MainPresenter implements MainPresenterInterface {
         if(presenter==null)presenter=new MainPresenter();
         return presenter;
     }
-
 
     @Override
     public void requestUserList() {
