@@ -2,13 +2,10 @@ package com.geekbrains.ael4_retrofit.dagger;
 
 import android.os.Bundle;
 
-import com.geekbrains.ael4_retrofit.MainActivity;
-import com.geekbrains.ael4_retrofit.database.Database;
 import com.geekbrains.ael4_retrofit.database.SugarModel;
 import com.geekbrains.ael4_retrofit.model.RepoUsers;
 import com.geekbrains.ael4_retrofit.presenters.MainPresenter;
 import com.geekbrains.ael4_retrofit.presenters.MainPresenterInterface;
-import com.orm.SugarContext;
 
 import java.util.Date;
 
@@ -18,7 +15,6 @@ import io.reactivex.Single;
 import io.reactivex.SingleOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import io.realm.Realm;
 
 @Module
 public class DaggerDBModules {
@@ -29,7 +25,7 @@ public class DaggerDBModules {
     }
 
     @Provides
-    Single<Bundle> actionSingle() {
+    Single<Bundle> sugarSave() {
         return Single.create((SingleOnSubscribe<Bundle>) emitter -> {
             try {
                 Date first = new Date();

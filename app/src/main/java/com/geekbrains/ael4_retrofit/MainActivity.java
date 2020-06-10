@@ -10,6 +10,10 @@ import com.geekbrains.ael4_retrofit.dagger.AppComponent;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,8 +23,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.geekbrains.ael4_retrofit.dagger.DaggerAppComponent;
-import com.geekbrains.ael4_retrofit.dagger.DaggerNetModules;
 import com.geekbrains.ael4_retrofit.database.DBHelperAction;
 import com.geekbrains.ael4_retrofit.database.DBHeper;
 import com.geekbrains.ael4_retrofit.database.Database;
@@ -65,9 +67,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
     private TextView sugarRes, sqliteRes, realmRes;
     private SQLiteDatabase db;
     private AppComponent appComponent;
-
+/*
     @Inject
     Single<Bundle> saveSugar;
+ */
     @Inject
     MainPresenterInterface presenter;
     @Inject
@@ -95,19 +98,20 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        OrmApp.getComponent().injectsToMainActivity(this);
         setContentView(R.layout.activity_main);
         SugarContext.init(getApplicationContext());
         Realm.init(getApplicationContext());
-        appComponent = DaggerAppComponent
+       /* appComponent = DaggerAppComponent
                 .builder()
                 .daggerNetModules(new DaggerNetModules(this))
-                .build();
-        appComponent.injectsToMainActivity(this);
+                .build();*/
+        //appComponent.injectsToMainActivity(this);
         presenter.bindView(this);
         DBHeper sqlite = new DBHeper(this);
         db = sqlite.getWritableDatabase();
 
-        if (appComponent.isConnected()) {
+        if (isConnected()) {
             presenter.requestUserList();
         } else {
             waitConnection();
@@ -124,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         observable.subscribe(new DisposableObserver<Long>() {
             @Override
             public void onNext(Long aLong) {
-                if(appComponent.isConnected())onComplete();
+                if(isConnected())onComplete();
             }
 
             @Override
@@ -170,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         Button realmAsync = (Button) findViewById(R.id.realm_btn_async);
       /*  sugarSave.setOnClickListener((v) ->appComponent.actionSingle(new SugarModelActions(presenter, Database.Action.DELETE))
                         .subscribeWith(createObserver(sugarRes)));*/
-        sugarSave.setOnClickListener((v) -> saveSugar.subscribeWith(createObserver(sugarRes)));
+        sugarSave.setOnClickListener((v) -> OrmApp.getDB().sugarSave().subscribeWith(createObserver(sugarRes)));
         sugarDelete.setOnClickListener((v) ->
                 actionSingle(new SugarModelActions(presenter, Database.Action.DELETE))
                         .subscribeWith(createObserver(sugarRes)));
@@ -238,6 +242,32 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
                 emitter.onError(e);
             }
         }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+    }
+
+    boolean isConnected() {
+        if (Build.VERSION.SDK_INT < 28) {
+            NetworkInfo networkInfo = OrmApp.getNetworkComponent(this).getNetworkInfo();
+            if (networkInfo != null) {
+                if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) return true;
+                return networkInfo.getType() == ConnectivityManager.TYPE_MOBILE;
+            }
+            return false;
+        } else {
+            ConnectivityManager connectivityManager=OrmApp.getNetworkComponent(this).getConnectivityManager();
+            if (connectivityManager  != null) {
+                NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(connectivityManager.getActiveNetwork());
+                if (capabilities != null) {
+                    if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)) {
+                        return true;
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)) {
+                        return true;
+                    } else if (capabilities.hasTransport(NetworkCapabilities.TRANSPORT_VPN)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
     private DisposableSingleObserver<Bundle> createObserver(TextView textView) {
